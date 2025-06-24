@@ -27,10 +27,10 @@ export function Loader({ isVisible, onComplete }: LoaderProps) {
   // Configurar partículas solo en el cliente - adaptativo según el dispositivo
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Detectar dispositivo lento
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-      const connection = (navigator as any).connection
-      const isSlowConnection = connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g')
+             // Detectar dispositivo lento
+       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+       const connection = (navigator as unknown as { connection?: { effectiveType?: string } }).connection
+       const isSlowConnection = connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g')
       const isLowEnd = isMobile || isSlowConnection
       
       const colors = ['#8B5CF6', '#EC4899', '#3B82F6', '#A855F7', '#F472B6', '#60A5FA']

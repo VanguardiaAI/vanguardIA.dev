@@ -43,14 +43,14 @@ export function getDeviceCapabilities() {
 
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
   
-  const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection
-  const hasSlowConnection = connection && PERFORMANCE_CONFIG.SLOW_CONNECTIONS.includes(connection.effectiveType)
+  const connection = (navigator as unknown as { connection?: { effectiveType?: string } }).connection
+  const hasSlowConnection = connection && PERFORMANCE_CONFIG.SLOW_CONNECTIONS.includes(connection.effectiveType || '')
   
-  const deviceMemory = (navigator as any).deviceMemory
-  const hasLowMemory = deviceMemory && deviceMemory < PERFORMANCE_CONFIG.LOW_MEMORY_THRESHOLD
+  const deviceMemory = (navigator as unknown as { deviceMemory?: number }).deviceMemory
+  const hasLowMemory = deviceMemory ? deviceMemory < PERFORMANCE_CONFIG.LOW_MEMORY_THRESHOLD : false
   
   const hardwareConcurrency = navigator.hardwareConcurrency
-  const hasLowCPU = hardwareConcurrency && hardwareConcurrency <= PERFORMANCE_CONFIG.LOW_CPU_CORES
+  const hasLowCPU = hardwareConcurrency ? hardwareConcurrency <= PERFORMANCE_CONFIG.LOW_CPU_CORES : false
   
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   

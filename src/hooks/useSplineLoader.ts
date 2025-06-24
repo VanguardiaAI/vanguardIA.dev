@@ -10,16 +10,16 @@ function isLowEndDevice(): boolean {
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
   
   // Detectar conexión lenta
-  const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection
+  const connection = (navigator as unknown as { connection?: { effectiveType?: string } }).connection
   const isSlowConnection = connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g' || connection.effectiveType === '3g')
   
   // Detectar memoria limitada (menos de 4GB)
-  const deviceMemory = (navigator as any).deviceMemory
-  const isLowMemory = deviceMemory && deviceMemory < 4
+  const deviceMemory = (navigator as unknown as { deviceMemory?: number }).deviceMemory
+  const isLowMemory = deviceMemory ? deviceMemory < 4 : false
   
   // Detectar CPU lenta
   const hardwareConcurrency = navigator.hardwareConcurrency
-  const isLowCPU = hardwareConcurrency && hardwareConcurrency <= 2
+  const isLowCPU = hardwareConcurrency ? hardwareConcurrency <= 2 : false
   
   return isMobile || isSlowConnection || isLowMemory || isLowCPU
 }
