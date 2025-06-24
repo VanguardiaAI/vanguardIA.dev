@@ -49,14 +49,9 @@ export const metadata: Metadata = {
     images: ["/logo.webp"],
   },
   icons: {
-    icon: [
-      { url: "/logo.ico", sizes: "32x32", type: "image/x-icon" },
-      { url: "/logo.ico", sizes: "16x16", type: "image/x-icon" },
-    ],
-    apple: [
-      { url: "/logo.webp", sizes: "180x180", type: "image/webp" },
-    ],
-    shortcut: "/logo.ico",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/logo.webp",
   },
   manifest: "/manifest.json",
 };
@@ -74,11 +69,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <head>
-        <link rel="icon" href="/logo.ico" type="image/x-icon" />
-        <link rel="apple-touch-icon" href="/logo.webp" />
-        <link rel="shortcut icon" href="/logo.ico" />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} antialiased`}
       >
