@@ -1,0 +1,32 @@
+{
+  "name": "VanguardIA - Agentes de IA que impulsan tu negocio",
+  "short_name": "VanguardIA",
+  "description": "Desarrollamos chatbots inteligentes, AI wrappers y aplicaciones de inteligencia artificial que automatizan procesos y convierten visitantes en clientes.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/logo.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/logo.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "lang": "es",
+  "dir": "ltr"
+} 
