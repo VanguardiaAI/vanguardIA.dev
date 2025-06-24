@@ -96,8 +96,9 @@ export function useSplineLoader() {
             loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
             splineLoad: totalLoadTime
           })
-        } catch (error) {
+        } catch {
           // Silently handle performance API errors
+          console.log('Performance API not available or error occurred')
         }
       }
     }

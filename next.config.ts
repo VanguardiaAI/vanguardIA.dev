@@ -36,7 +36,7 @@ const nextConfig: NextConfig = {
 
   // Optimizaciones experimentales
   experimental: {
-    optimizeCss: true,
+    // Removido optimizeCss por compatibilidad
     optimizePackageImports: [
       'framer-motion',
       'lucide-react',

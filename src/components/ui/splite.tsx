@@ -63,7 +63,7 @@ export const SplineScene = memo(function SplineScene({
     onLoad?.()
   }
 
-  const handleError = (error: any) => {
+  const handleError = (error: Error | unknown) => {
     console.warn('Spline loading error:', error)
     setHasError(true)
     onError?.()
