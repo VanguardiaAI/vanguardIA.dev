@@ -2,7 +2,156 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Optimizaciones de rendimiento globales */
+* {
+  /* Optimizar el rendering del texto */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
 
+html {
+  /* Mejorar el scroll suave */
+  scroll-behavior: smooth;
+  /* Optimizar el rendering */
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  /* Prevenir overflow horizontal */
+  overflow-x: hidden;
+  /* Optimizar compositing */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Optimizaciones para elementos animados */
+[data-framer-motion] {
+  /* Force hardware acceleration */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  /* Optimizar compositing */
+  will-change: transform, opacity;
+  /* Mejorar rendering de bordes */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  /* Optimizar perspectiva */
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+}
+
+/* Optimizaciones específicas para gradientes */
+.gradient-text {
+  /* Optimizar rendering de gradientes */
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  /* Force hardware acceleration */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Optimizaciones para imágenes */
+img {
+  /* Mejorar calidad de redimensionamiento */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  /* Optimizar carga */
+  loading: lazy;
+  decoding: async;
+}
+
+/* Optimizaciones para SVG */
+svg {
+  /* Optimizar rendering */
+  shape-rendering: geometricPrecision;
+  /* Force hardware acceleration */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Optimizaciones para botones y elementos interactivos */
+button, a, [role="button"] {
+  /* Optimizar interacciones táctiles */
+  -webkit-tap-highlight-color: transparent;
+  /* Force hardware acceleration en hover */
+  will-change: transform;
+}
+
+/* Optimizaciones para el loader */
+.loader-text {
+  /* Optimizar animación de texto */
+  will-change: opacity, transform;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Optimizaciones para Spline canvas */
+canvas {
+  /* Optimizar rendering 3D */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: optimize-contrast;
+  /* Force hardware acceleration */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  /* Optimizar compositing */
+  will-change: transform;
+}
+
+/* Reducir motion para usuarios que lo prefieren */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  [data-framer-motion] {
+    will-change: auto;
+  }
+}
+
+/* Optimizaciones para dispositivos de alta densidad */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Mejorar rendering en pantallas retina */
+  * {
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+}
+
+/* Optimizaciones específicas para móviles */
+@media (max-width: 768px) {
+  /* Reducir complejidad en móviles */
+  [data-framer-motion] {
+    will-change: auto;
+  }
+  
+  /* Optimizar scroll en móviles */
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Utilidades de rendimiento personalizadas */
+@layer utilities {
+  .gpu-accelerated {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+  }
+  
+  .optimize-text {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  
+  .reduce-motion {
+    animation: none !important;
+    transition: none !important;
+  }
+}
 
 @layer base {
   :root {
