@@ -348,11 +348,11 @@ export function AnimatedAIChat() {
 
     return (
         <div className="h-screen w-full bg-transparent text-white relative overflow-hidden">
-            {/* Gradiente superior - Filtro de negro a transparente */}
-            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black via-black/50 to-transparent z-30 pointer-events-none" />
+            {/* Gradiente superior - Más sutil y solo en desktop */}
+            <div className="hidden md:block absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black via-black/30 to-transparent z-30 pointer-events-none" />
             
-            {/* Gradiente inferior - Filtro de negro a transparente */}
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black via-black/50 to-transparent z-30 pointer-events-none" />
+            {/* Gradiente inferior - Más sutil y solo en desktop */}
+            <div className="hidden md:block absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black via-black/30 to-transparent z-30 pointer-events-none" />
             
             {/* Contenido Principal - Sin scroll, altura fija */}
             <div className="h-full flex items-center justify-center p-6 overflow-hidden">

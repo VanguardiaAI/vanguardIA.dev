@@ -124,13 +124,13 @@ export default function Home() {
             {/* Bottom Section */}
             <div className="border-t border-neutral-800 mt-12 pt-8 flex flex-col md:flex-row justify-center items-center">
               <p className="text-neutral-500 text-sm">
-                © 2024 VanguardIA.dev. Todos los derechos reservados.
+                © 2025 VanguardIA. Todos los derechos reservados.
               </p>
             </div>
           </div>
 
-          {/* Background Effect */}
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
+          {/* Background Effect - Solo visible en desktop */}
+          <div className="hidden md:block absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
         </footer>
 
         {/* Contact Modal */}
