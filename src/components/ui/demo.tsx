@@ -10,16 +10,16 @@ import SpotlightCard from "@/components/ui/SpotlightCard";
 export function SplineSceneBasic() {
   const aboutRef = useRef(null);
   const isInView = useInView(aboutRef, { once: true, margin: "-100px" });
-  const { onSplineLoad, onSplineError } = useSplineLoader();
+  const { onSplineLoad, onSplineError, isLowEnd } = useSplineLoader();
 
-  // Animation variants
+  // Animation variants optimizadas para dispositivos lentos
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
+        staggerChildren: isLowEnd ? 0.05 : 0.1,
+        delayChildren: isLowEnd ? 0.1 : 0.2,
       },
     },
   };
@@ -27,15 +27,15 @@ export function SplineSceneBasic() {
   const itemVariants = {
     hidden: { 
       opacity: 0, 
-      y: 50,
-      filter: "blur(10px)"
+      y: isLowEnd ? 20 : 50,
+      filter: isLowEnd ? "none" : "blur(10px)" // Sin blur en dispositivos lentos
     },
     visible: { 
       opacity: 1, 
       y: 0,
       filter: "blur(0px)",
       transition: {
-        duration: 0.8,
+        duration: isLowEnd ? 0.4 : 0.8,
         ease: "easeOut"
       }
     },
@@ -44,9 +44,9 @@ export function SplineSceneBasic() {
   const cardVariants = {
     hidden: { 
       opacity: 0, 
-      y: 100,
-      scale: 0.8,
-      filter: "blur(10px)"
+      y: isLowEnd ? 30 : 100,
+      scale: isLowEnd ? 1 : 0.8,
+      filter: isLowEnd ? "none" : "blur(10px)" // Sin blur en dispositivos lentos
     },
     visible: { 
       opacity: 1, 
@@ -54,7 +54,7 @@ export function SplineSceneBasic() {
       scale: 1,
       filter: "blur(0px)",
       transition: {
-        duration: 1,
+        duration: isLowEnd ? 0.5 : 1,
         ease: "easeOut"
       }
     },
@@ -69,15 +69,28 @@ export function SplineSceneBasic() {
           {/* 3D Robot Animation - Arriba en móvil */}
           <div className="w-full h-[60vh] relative flex items-center justify-center">
             <div className="w-full h-full relative">
-              <SplineScene 
-                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode" 
-                className="w-full h-full scale-150"
-                onLoad={onSplineLoad}
-                onError={onSplineError}
-              />
+              {/* Renderizar Spline solo en dispositivos rápidos o usar fallback */}
+              {isLowEnd ? (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-lg">
+                  <div className="text-center">
+                    <div className="w-32 h-32 mx-auto mb-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                      <svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <p className="text-white text-lg font-semibold">VanguardIA</p>
+                    <p className="text-gray-400">AI Solutions</p>
+                  </div>
+                </div>
+              ) : (
+                <SplineScene 
+                  scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode" 
+                  className="w-full h-full scale-150"
+                  onLoad={onSplineLoad}
+                  onError={onSplineError}
+                />
+              )}
             </div>
-            
-            {/* Sin gradiente en móvil para evitar interferencias */}
           </div>
           
           {/* Content - Abajo en móvil */}

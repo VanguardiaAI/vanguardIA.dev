@@ -12,14 +12,18 @@ import { useState } from "react";
 import Image from "next/image";
 
 export default function Home() {
-  const { isLoading } = useSplineLoader();
+  const { isLoading, isLowEnd } = useSplineLoader();
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   const handleLoaderComplete = () => {
     console.log('Loader completed');
   };
 
-
+  // Configuraciones optimizadas para dispositivos lentos
+  const animationConfig = {
+    duration: isLowEnd ? 0.3 : 0.5,
+    ease: isLowEnd ? "easeOut" : "easeInOut"
+  };
 
   return (
     <>
@@ -34,7 +38,10 @@ export default function Home() {
         className="min-h-screen bg-black"
         initial={{ opacity: 0 }}
         animate={{ opacity: isLoading ? 0 : 1 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
+        transition={{ 
+          duration: animationConfig.duration, 
+          ease: animationConfig.ease 
+        }}
       >
         {/* Navigation */}
         <Navbar />
@@ -49,8 +56,27 @@ export default function Home() {
           <ServicesSection />
         </section>
 
-        {/* CTA Section with Orb */}
-        <CTASection />
+        {/* CTA Section with Orb - Simplificado en dispositivos lentos */}
+        {isLowEnd ? (
+          <section className="w-full py-20 bg-black">
+            <div className="max-w-7xl mx-auto px-6 text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                ¿Listo para transformar tu negocio?
+              </h2>
+              <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
+                Comienza tu viaje hacia la automatización inteligente hoy mismo.
+              </p>
+              <button 
+                onClick={() => setIsContactModalOpen(true)}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-colors duration-300"
+              >
+                Contactar Ahora
+              </button>
+            </div>
+          </section>
+        ) : (
+          <CTASection />
+        )}
 
         {/* Footer */}
         <footer className="bg-black border-t border-neutral-800">
@@ -66,6 +92,7 @@ export default function Home() {
                       width={32}
                       height={32}
                       className="w-full h-full object-contain"
+                      priority={!isLowEnd} // Prioridad solo en dispositivos rápidos
                     />
                   </div>
                   <span className="text-white text-xl font-semibold">VanguardIA.dev</span>
@@ -124,8 +151,10 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Background Effect - Solo visible en desktop */}
-          <div className="hidden md:block absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
+          {/* Background Effect - Solo visible en desktop y dispositivos rápidos */}
+          {!isLowEnd && (
+            <div className="hidden md:block absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
+          )}
         </footer>
 
         {/* Contact Modal */}

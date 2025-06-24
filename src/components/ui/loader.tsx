@@ -24,19 +24,27 @@ export function Loader({ isVisible, onComplete }: LoaderProps) {
   const [showLoader, setShowLoader] = useState(isVisible)
   const [particles, setParticles] = useState<Particle[]>([])
 
-  // Configurar partículas solo en el cliente - menos partículas para más velocidad
+  // Configurar partículas solo en el cliente - adaptativo según el dispositivo
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Detectar dispositivo lento
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      const connection = (navigator as any).connection
+      const isSlowConnection = connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g')
+      const isLowEnd = isMobile || isSlowConnection
+      
       const colors = ['#8B5CF6', '#EC4899', '#3B82F6', '#A855F7', '#F472B6', '#60A5FA']
-      const newParticles: Particle[] = Array.from({ length: 8 }, (_, i) => ({ // Reducido a 8 partículas
+      const particleCount = isLowEnd ? 4 : 8 // Menos partículas en dispositivos lentos
+      
+      const newParticles: Particle[] = Array.from({ length: particleCount }, (_, i) => ({
         id: i,
         color: colors[Math.floor(Math.random() * colors.length)],
         initialX: Math.random() * window.innerWidth,
         initialY: window.innerHeight + 50,
         targetX: Math.random() * window.innerWidth,
-        delay: Math.random() * 1, // Reducido el delay máximo
-        duration: 2 + Math.random() * 1, // Reducido la duración
-        glowSize: 2 + Math.random() * 3
+        delay: Math.random() * (isLowEnd ? 0.5 : 1), // Delay más corto en dispositivos lentos
+        duration: isLowEnd ? 1.5 : 2 + Math.random() * 1, // Duración más corta
+        glowSize: isLowEnd ? 1 + Math.random() * 2 : 2 + Math.random() * 3
       }))
       setParticles(newParticles)
     }

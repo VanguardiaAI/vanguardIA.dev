@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Renderer, Program, Mesh, Triangle, Vec3 } from "ogl";
 
 interface OrbProps {
@@ -10,6 +10,47 @@ interface OrbProps {
   forceHoverState?: boolean;
 }
 
+// Función para detectar dispositivos de baja potencia
+function isLowEndDevice(): boolean {
+  if (typeof window === 'undefined') return false
+  
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  const connection = (navigator as any).connection
+  const isSlowConnection = connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g' || connection.effectiveType === '3g')
+  const deviceMemory = (navigator as any).deviceMemory
+  const isLowMemory = deviceMemory && deviceMemory < 4
+  const hardwareConcurrency = navigator.hardwareConcurrency
+  const isLowCPU = hardwareConcurrency && hardwareConcurrency <= 2
+  
+  return isMobile || isSlowConnection || isLowMemory || isLowCPU
+}
+
+// Componente fallback simple para dispositivos lentos
+function SimpleOrb({ hue = 0 }: { hue?: number }) {
+  return (
+    <div className="w-full h-full relative flex items-center justify-center">
+      <div 
+        className="w-64 h-64 rounded-full animate-pulse"
+        style={{
+          background: `radial-gradient(circle, 
+            hsl(${hue + 280}, 70%, 60%) 0%, 
+            hsl(${hue + 320}, 70%, 50%) 30%, 
+            hsl(${hue + 240}, 60%, 40%) 60%, 
+            transparent 100%)`
+        }}
+      />
+      <div 
+        className="absolute w-48 h-48 rounded-full animate-ping"
+        style={{
+          background: `radial-gradient(circle, 
+            hsl(${hue + 280}, 70%, 60%) 0%, 
+            transparent 70%)`
+        }}
+      />
+    </div>
+  )
+}
+
 export default function Orb({
   hue = 0,
   hoverIntensity = 0.2,
@@ -17,6 +58,17 @@ export default function Orb({
   forceHoverState = false,
 }: OrbProps) {
   const ctnDom = useRef<HTMLDivElement>(null);
+  const [isLowEnd, setIsLowEnd] = useState(false);
+
+  // Detectar dispositivo de baja potencia
+  useEffect(() => {
+    setIsLowEnd(isLowEndDevice());
+  }, []);
+
+  // Si es un dispositivo de baja potencia, usar el componente simple
+  if (isLowEnd) {
+    return <SimpleOrb hue={hue} />;
+  }
 
   const vert = /* glsl */ `
     precision highp float;
@@ -199,8 +251,8 @@ export default function Orb({
           ),
         },
         hue: { value: hue },
-        hover: { value: 0 },
-        rot: { value: 0 },
+        hover: { value: forceHoverState ? 1.0 : 0.0 },
+        rot: { value: 0.0 },
         hoverIntensity: { value: hoverIntensity },
       },
     });
@@ -209,84 +261,74 @@ export default function Orb({
 
     function resize() {
       if (!container) return;
-      const dpr = window.devicePixelRatio || 1;
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-      renderer.setSize(width * dpr, height * dpr);
-      gl.canvas.style.width = width + "px";
-      gl.canvas.style.height = height + "px";
-      program.uniforms.iResolution.value.set(
-        gl.canvas.width,
-        gl.canvas.height,
-        gl.canvas.width / gl.canvas.height
+      const { clientWidth, clientHeight } = container;
+      renderer.setSize(clientWidth, clientHeight);
+      program.uniforms.iResolution.value = new Vec3(
+        clientWidth,
+        clientHeight,
+        clientWidth / clientHeight
       );
     }
-    window.addEventListener("resize", resize);
-    resize();
 
-    let targetHover = 0;
-    let lastTime = 0;
+    resize();
+    window.addEventListener("resize", resize);
+
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetHover = forceHoverState ? 1.0 : 0.0;
+    let currentHover = targetHover;
+    let targetRot = 0;
     let currentRot = 0;
-    const rotationSpeed = 0.3; // radians per second
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (!rotateOnHover && !forceHoverState) return;
+      
       const rect = container.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const width = rect.width;
-      const height = rect.height;
-      const size = Math.min(width, height);
-      const centerX = width / 2;
-      const centerY = height / 2;
-      const uvX = ((x - centerX) / size) * 2.0;
-      const uvY = ((y - centerY) / size) * 2.0;
-
-      if (Math.sqrt(uvX * uvX + uvY * uvY) < 0.8) {
-        targetHover = 1;
-      } else {
-        targetHover = 0;
+      mouseX = (e.clientX - rect.left) / rect.width;
+      mouseY = (e.clientY - rect.top) / rect.height;
+      
+      targetHover = 1.0;
+      if (rotateOnHover) {
+        targetRot = (mouseX - 0.5) * 0.5;
       }
     };
 
     const handleMouseLeave = () => {
-      targetHover = 0;
+      if (forceHoverState) return;
+      targetHover = 0.0;
+      targetRot = 0;
     };
 
     container.addEventListener("mousemove", handleMouseMove);
     container.addEventListener("mouseleave", handleMouseLeave);
 
-    let rafId: number;
     const update = (t: number) => {
-      rafId = requestAnimationFrame(update);
-      const dt = (t - lastTime) * 0.001;
-      lastTime = t;
-      program.uniforms.iTime.value = t * 0.001;
-      program.uniforms.hue.value = hue;
-      program.uniforms.hoverIntensity.value = hoverIntensity;
-
-      const effectiveHover = forceHoverState ? 1 : targetHover;
-      program.uniforms.hover.value += (effectiveHover - program.uniforms.hover.value) * 0.1;
-
-      if (rotateOnHover && effectiveHover > 0.5) {
-        currentRot += dt * rotationSpeed;
-      }
+      // Reducir la frecuencia de actualización en dispositivos lentos
+      const timeScale = isLowEnd ? 0.5 : 1.0;
+      program.uniforms.iTime.value = t * 0.001 * timeScale;
+      
+      currentHover += (targetHover - currentHover) * 0.1;
+      currentRot += (targetRot - currentRot) * 0.1;
+      
+      program.uniforms.hover.value = currentHover;
       program.uniforms.rot.value = currentRot;
-
+      
       renderer.render({ scene: mesh });
+      requestAnimationFrame(update);
     };
-    rafId = requestAnimationFrame(update);
+
+    requestAnimationFrame(update);
 
     return () => {
-      cancelAnimationFrame(rafId);
       window.removeEventListener("resize", resize);
       container.removeEventListener("mousemove", handleMouseMove);
       container.removeEventListener("mouseleave", handleMouseLeave);
       if (container.contains(gl.canvas)) {
         container.removeChild(gl.canvas);
       }
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      renderer.gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [hue, hoverIntensity, rotateOnHover, forceHoverState, frag, vert]);
+  }, [hue, hoverIntensity, rotateOnHover, forceHoverState, isLowEnd]);
 
   return <div ref={ctnDom} className="w-full h-full" />;
 } 
